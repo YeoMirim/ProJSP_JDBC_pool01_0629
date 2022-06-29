@@ -6,22 +6,35 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
 import com.ici.dto.MemberDto;
 
 
 public class MemberDao {	// DAO는 데이터베이스의 data에 접근하기 위한 객체, Method형태로 사용 
 	
-	private String driverName = "com.mysql.jdbc.Driver";
-	private String url = "jdbc:mysql://localhost:3306/odbo";
-	private String username = "root";
-	private String password = "12345";			// 멤버변수로 선언해서 한번에 부르게 만듬
-	
+//	private String driverName = "com.mysql.jdbc.Driver";
+//	private String url = "jdbc:mysql://localhost:3306/odbo";
+//	private String username = "root";
+//	private String password = "12345";			// 멤버변수로 선언해서 한번에 부르게 만듬
+
+	private DataSource dataSource;
 	
 	public MemberDao() {		// 생성자 만들어서 자동 호출
+//		try {
+//			Class.forName(driverName);	//드라이버 로딩
+//		}
+//		catch (Exception e) {		// 에러가 난 경우
+//			e.printStackTrace();
+//		}
+		
 		try {
-			Class.forName(driverName);	//드라이버 로딩
+			Context context = new InitialContext();
+			dataSource = (DataSource) context.lookup("java:comp/env/jdbc/odbo"); // 형변환 필요
 		}
-		catch (Exception e) {		// 에러가 난 경우
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -37,7 +50,8 @@ public class MemberDao {	// DAO는 데이터베이스의 data에 접근하기 �
 		ResultSet rs = null;
 		
 		try {
-			conn = DriverManager.getConnection(url, username, password);
+//			conn = DriverManager.getConnection(url, username, password);
+			conn = dataSource.getConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery("select * from testmember");
 			
